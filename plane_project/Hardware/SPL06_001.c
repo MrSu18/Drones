@@ -1,6 +1,6 @@
 #ifndef SPL06_01_C
 #define SPL06_01_C
-#include "SPL06_001.h"
+#include "spl06_001.h"
 #include "main.h"
 
 extern I2C_HandleTypeDef hi2c1;
@@ -16,16 +16,16 @@ extern I2C_HandleTypeDef hi2c1;
 
 //¼Ä´æÆ÷¶¨Òå
 #define PRESSURE_REG 0X00
-#define TEMP_REG 0X03
-#define PRS_CFG_REG 0x06 //ÆøÑ¹²âÁ¿ËÙÂÊÅäÖÃ
-#define TMP_CFG_REG 0x07 //ÎÂ¶È²âÁ¿ËÙ¶ÈÅäÖÃ
+#define TEMP_REG     0X03
+#define PRS_CFG_REG  0x06 //ÆøÑ¹²âÁ¿ËÙÂÊÅäÖÃ
+#define TMP_CFG_REG  0x07 //ÎÂ¶È²âÁ¿ËÙ¶ÈÅäÖÃ
 #define MEAS_CFG_REG 0x08 //²âÁ¿ÅäÖÃÓë´«¸ĞÆ÷ÅäÖÃ
-#define CFG_REG 0x09 //ÖĞ¶Ï/FIFO/SPIÏßÊıµÈÅäÖÃ
-#define INT_STS_REG 0X0A //ÖĞ¶Ï×´Ì¬±êÖ¾Î»
+#define CFG_REG      0x09 //ÖĞ¶Ï/FIFO/SPIÏßÊıµÈÅäÖÃ
+#define INT_STS_REG  0X0A //ÖĞ¶Ï×´Ì¬±êÖ¾Î»
 #define FIFO_STS_REG 0X0B //FIFO×´Ì¬
-#define RESET_REG 0X0C
-#define ID_REG 0x0D
-#define COEF_REG 0x10
+#define RESET_REG    0X0C
+#define ID_REG       0x0D
+#define COEF_REG     0x10
 
 //#define HW_ADR 0x77 //SDO HIGH OR NC//µ±SDOÀ­¸ß»òÕß¸¡¿ÕÊ¹ÓÃµÄI2CµØÖ·
 //#define HW_ADR 0x76 //SDO LOW//µ±SDOÀ­µÍÊ¹ÓÃµÄI2CµØÖ·
@@ -43,27 +43,27 @@ static struct  {  //ÄÚ²¿³ö³§Ğ£×¼Êı¾İ
     int16_t c20;
     int16_t c21;
     int16_t c30;       
-}SPL06_calib_param;
+}spl06_calib_param;
 
 
 struct  {  
-    uint8_t chip_id; /**<chip id*/  
-    int32_t i32rawPressure;//Ô­Ê¼ÆøÑ¹Êı¾İ
+    uint8_t chip_id;          //<chip id  
+    int32_t i32rawPressure;   //Ô­Ê¼ÆøÑ¹Êı¾İ
     int32_t i32rawTemperature;//Ô­Ê¼ÎÂ¶ÈÊı¾İ
-    int32_t i32kP;    //ÆøÑ¹²¹³¥²ÎÊı
-    int32_t i32kT;//ÎÂ¶È²¹³¥²ÎÊı
-}SPL06;
+    int32_t i32kP;            //ÆøÑ¹²¹³¥²ÎÊı
+    int32_t i32kT;            //ÎÂ¶È²¹³¥²ÎÊı
+}spl06;
 
 
 
 //I2CÅäÖÃ
-//#define SPL06_001_write(ADDR,REG,DATA)  IIC_Write_1Byte(&hi2c1,ADDR,REG,DATA)
-void SPL06_001_write(uint8_t hwadr, uint8_t regadr, uint8_t wdata)
+//#define spl0601_write(ADDR,REG,DATA)  IIC_Write_1Byte(&hi2c1,ADDR,REG,DATA)
+void spl0601_write(uint8_t hwadr, uint8_t regadr, uint8_t wdata)
 {
   HAL_I2C_Mem_Write(&hi2c1,hwadr,regadr,I2C_MEMADD_SIZE_8BIT,&wdata,1,10);
 }
 
-uint8_t SPL06_001_read(uint8_t hwadr, uint8_t regadr)
+uint8_t spl0601_read(uint8_t hwadr, uint8_t regadr)
 {
   uint8_t reg_data;
   
@@ -79,16 +79,16 @@ uint8_t SPL06_001_read(uint8_t hwadr, uint8_t regadr)
  * @param[out] 
  * @return     
  **********************************************************************/
-#define PRESSURE_RATE_1_TIMES 0 //²ÉÑùÂÊ 
-#define PRESSURE_RATE_2_TIMES 1
-#define PRESSURE_RATE_4_TIMES 2
-#define PRESSURE_RATE_8_TIMES 3
-#define PRESSURE_RATE_16_TIMES 4
-#define PRESSURE_RATE_32_TIMES 5
-#define PRESSURE_RATE_64_TIMES 6
+#define PRESSURE_RATE_1_TIMES   0 //²ÉÑùÂÊ 
+#define PRESSURE_RATE_2_TIMES   1
+#define PRESSURE_RATE_4_TIMES   2
+#define PRESSURE_RATE_8_TIMES   3
+#define PRESSURE_RATE_16_TIMES  4
+#define PRESSURE_RATE_32_TIMES  5
+#define PRESSURE_RATE_64_TIMES  6
 #define PRESSURE_RATE_128_TIMES 7
 
-void SPL06_pressure_rate_config(uint8_t background_rate,uint8_t oversamply)
+void spl06_pressure_rate_config(uint8_t background_rate,uint8_t oversamply)
 {
     uint8_t data;
   
@@ -96,39 +96,39 @@ void SPL06_pressure_rate_config(uint8_t background_rate,uint8_t oversamply)
     if(oversamply>PRESSURE_RATE_8_TIMES)//¹ı²ÉÑù´ÎÊı´óÓÚEMPERATURE_RATE_8_TIMES£¬Ó¦µ±ÔÊĞíÊı¾İ±»ĞÂµÄÊı¾İ¸²¸Ç£¬ÄÚ²¿ÓµÓĞÆøÑ¹ºÍÎÂ¶È¹²32¼¶µÄFIFO£¬ÔÚ´óÓÚ8´Î£¨Ò²¾ÍÊÇ´óÓÚ»òµÈÓÚ16´Î¹ı²ÉÑù£©µÄÊ±ºòĞèÒª±»ĞÂµÄÊı¾İ¸²¸Ç£¬·ñÔòÊı¾İ¾Í»á¶ªÊ§
     {
         uint8_t data;
-        data = SPL06_001_read(SPL06_ADDR, CFG_REG);//¶ÁÈ¡Ô­¼Ä´æÆ÷Öµ
+        data = spl0601_read(SPL06_ADDR, CFG_REG);//¶ÁÈ¡Ô­¼Ä´æÆ÷Öµ
         data |= 0X04;//P-SHIFTÎ»ÖÃ1
-        SPL06_001_write(SPL06_ADDR, CFG_REG, data);//ÖØĞÂĞ´»Ø¼Ä´æÆ÷          
+        spl0601_write(SPL06_ADDR, CFG_REG, data);//ÖØĞÂĞ´»Ø¼Ä´æÆ÷          
     }    
     switch(oversamply)
     {
         case PRESSURE_RATE_2_TIMES:
-          SPL06.i32kP = 1572864;
+          spl06.i32kP = 1572864;
             break;
         case PRESSURE_RATE_4_TIMES:
-            SPL06.i32kP  = 3670016;
+            spl06.i32kP  = 3670016;
             break;
         case PRESSURE_RATE_8_TIMES:
-            SPL06.i32kP  = 7864320;
+            spl06.i32kP  = 7864320;
             break;
         case PRESSURE_RATE_16_TIMES:
-            SPL06.i32kP = 253952;
+            spl06.i32kP = 253952;
             break;
         case PRESSURE_RATE_32_TIMES:
-            SPL06.i32kP = 516096;       
+            spl06.i32kP = 516096;       
             break;
         case PRESSURE_RATE_64_TIMES:
-            SPL06.i32kP = 1040384;           
+            spl06.i32kP = 1040384;           
             break;
         case PRESSURE_RATE_128_TIMES:
-            SPL06.i32kP = 2088960;
+            spl06.i32kP = 2088960;
             break;
         case PRESSURE_RATE_1_TIMES:
         default:
-            SPL06.i32kP = 524288;
+            spl06.i32kP = 524288;
             break;
     }    
-    SPL06_001_write(SPL06_ADDR, PRS_CFG_REG, data);//Ğ´ÈëÅäÖÃ
+    spl0601_write(SPL06_ADDR, PRS_CFG_REG, data);//Ğ´ÈëÅäÖÃ
 }
 
 /***********************************************************************
@@ -137,17 +137,17 @@ void SPL06_pressure_rate_config(uint8_t background_rate,uint8_t oversamply)
  * @param[out] 
  * @return     
  **********************************************************************/
-#define TEMPERATURE_RATE_1_TIMES 0 //²ÉÑùÂÊ
-#define TEMPERATURE_RATE_2_TIMES 1
-#define TEMPERATURE_RATE_4_TIMES 2
-#define TEMPERATURE_RATE_8_TIMES 3
-#define TEMPERATURE_RATE_16_TIMES 4
-#define TEMPERATURE_RATE_32_TIMES 5
-#define TEMPERATURE_RATE_64_TIMES 6
+#define TEMPERATURE_RATE_1_TIMES   0 //²ÉÑùÂÊ
+#define TEMPERATURE_RATE_2_TIMES   1
+#define TEMPERATURE_RATE_4_TIMES   2
+#define TEMPERATURE_RATE_8_TIMES   3
+#define TEMPERATURE_RATE_16_TIMES  4
+#define TEMPERATURE_RATE_32_TIMES  5
+#define TEMPERATURE_RATE_64_TIMES  6
 #define TEMPERATURE_RATE_128_TIMES 7
 #define TEMPERATURE_RATE_TMP_EXT_INTERNAL 0  //¼¯³ÉµçÂ·ÉÏµÄÎÂ¶È¼Æ
 #define TEMPERATURE_RATE_TMP_EXT_EXTERNAL 1  //´«¸ĞÆ÷MEMSÆøÑ¹Ğ¾Æ¬ÉÏÎÂ¶È¼Æ
-void SPL06_temperature_rate_config(uint8_t background_rate,uint8_t oversamply,uint8_t ext)
+void spl06_temperature_rate_config(uint8_t background_rate,uint8_t oversamply,uint8_t ext)
 {
     uint8_t data;
   
@@ -155,39 +155,39 @@ void SPL06_temperature_rate_config(uint8_t background_rate,uint8_t oversamply,ui
       if(oversamply>TEMPERATURE_RATE_8_TIMES)//¹ı²ÉÑù´ÎÊı´óÓÚEMPERATURE_RATE_8_TIMES£¬Ó¦µ±ÔÊĞíÊı¾İ±»ĞÂµÄÊı¾İ¸²¸Ç
       {
           uint8_t data;
-          data = SPL06_001_read(SPL06_ADDR, CFG_REG);//¶ÁÈ¡Ô­¼Ä´æÆ÷Öµ
+          data = spl0601_read(SPL06_ADDR, CFG_REG);//¶ÁÈ¡Ô­¼Ä´æÆ÷Öµ
           data |= 0X08;//T-SHIFTÎ»ÖÃ1
-          SPL06_001_write(SPL06_ADDR, CFG_REG, data);  //ÖØĞÂĞ´»Ø¼Ä´æÆ÷          
+          spl0601_write(SPL06_ADDR, CFG_REG, data);  //ÖØĞÂĞ´»Ø¼Ä´æÆ÷          
       }      
     switch(oversamply)
     {
         case TEMPERATURE_RATE_2_TIMES:
-          SPL06.i32kT = 1572864;
+          spl06.i32kT = 1572864;
             break;
         case TEMPERATURE_RATE_4_TIMES:
-            SPL06.i32kT  = 3670016;
+            spl06.i32kT  = 3670016;
             break;
         case TEMPERATURE_RATE_8_TIMES:
-            SPL06.i32kT  = 7864320;
+            spl06.i32kT  = 7864320;
             break;
         case TEMPERATURE_RATE_16_TIMES:
-            SPL06.i32kT = 253952;
+            spl06.i32kT = 253952;
             break;
         case TEMPERATURE_RATE_32_TIMES:
-            SPL06.i32kT = 516096;       
+            spl06.i32kT = 516096;       
             break;
         case TEMPERATURE_RATE_64_TIMES:
-            SPL06.i32kT = 1040384;           
+            spl06.i32kT = 1040384;           
             break;
         case TEMPERATURE_RATE_128_TIMES:
-            SPL06.i32kT = 2088960;
+            spl06.i32kT = 2088960;
             break;
         case TEMPERATURE_RATE_1_TIMES:
         default:
-            SPL06.i32kT = 524288;
+            spl06.i32kT = 524288;
             break;
     }    
-    SPL06_001_write(SPL06_ADDR, TMP_CFG_REG, data);//Ğ´ÈëÅäÖÃ
+    spl0601_write(SPL06_ADDR, TMP_CFG_REG, data);//Ğ´ÈëÅäÖÃ
 }
 /***********************************************************************
  * ´«¸ĞÆ÷²âÁ¿Ä£Ê½ÅäÖÃÓë×´Ì¬¶ÁÈ¡
@@ -195,40 +195,40 @@ void SPL06_temperature_rate_config(uint8_t background_rate,uint8_t oversamply,ui
  * @param[out] 
  * @return     
  **********************************************************************/
-#define MEAS_CFG_COEF_RDY 0X80 // ´«¸ĞÆ÷ÄÚ²¿Ğ£×¼Öµ¿É¶Á£¬ÔÚÆô¶¯ºó
+#define MEAS_CFG_COEF_RDY   0X80 // ´«¸ĞÆ÷ÄÚ²¿Ğ£×¼Öµ¿É¶Á£¬ÔÚÆô¶¯ºó
 #define MEAS_CFG_SENSOR_RDY 0X40 // ´«¸ĞÆ÷ÒÑ³õÊ¼»¯Íê³É£¬ÔÚÆô¶¯ºó
-#define MEAS_CFG_TMP_RDY 0x20 //ÎÂ¶ÈÖµÒÑ¾­×¼±¸¾ÍĞ÷£¬¿ÉÒÔ½øĞĞ¶ÁÈ¡£¬¸Ã±êÖ¾Î»¶ÁÈ¡ºó×Ô¶¯Çå0
-#define MEAS_CFG_PRS_RDY 0x10 //ÆøÑ¹ÖµÒÑ¾­×¼±¸¾ÍĞ÷£¬¿ÉÒÔ½øĞĞ¶ÁÈ¡£¬¸Ã±êÖ¾Î»
-#define MEAS_CFG_MEAS_CTR_STANDBY 0 //Ä£Ê½ÅäÖÃ ¹ÒÆğÄ£Ê½
-#define MEAS_CFG_MEAS_CTR_COMMAND_PRS 0x01 //Ä£Ê½ÅäÖÃ ÃüÁîÄ£Ê½ÏÂÆô¶¯ÆøÑ¹²É¼¯
-#define MEAS_CFG_MEAS_CTR_COMMAND_TMP 0x02 //Ä£Ê½ÅäÖÃ ÃüÁîÄ£Ê½ÏÂÆô¶¯ÎÂ¶È²É¼¯
-#define MEAS_CFG_MEAS_CTR_BACKGROUND_PRS 0x05 //Ä£Ê½ÅäÖÃ ºóÌ¨Ä£Ê½Ö»¶ÁÈ¡ÆøÑ¹Öµ
-#define MEAS_CFG_MEAS_CTR_BACKGROUND_TMP 0X06 //Ä£Ê½ÅäÖÃ ºóÌ¨Ä£Ê½Ö»¶ÁÈ¡ÎÂ¶ÈÖµ
+#define MEAS_CFG_TMP_RDY    0x20 //ÎÂ¶ÈÖµÒÑ¾­×¼±¸¾ÍĞ÷£¬¿ÉÒÔ½øĞĞ¶ÁÈ¡£¬¸Ã±êÖ¾Î»¶ÁÈ¡ºó×Ô¶¯Çå0
+#define MEAS_CFG_PRS_RDY    0x10 //ÆøÑ¹ÖµÒÑ¾­×¼±¸¾ÍĞ÷£¬¿ÉÒÔ½øĞĞ¶ÁÈ¡£¬¸Ã±êÖ¾Î»
+#define MEAS_CFG_MEAS_CTR_STANDBY            0x00 //Ä£Ê½ÅäÖÃ ¹ÒÆğÄ£Ê½
+#define MEAS_CFG_MEAS_CTR_COMMAND_PRS        0x01 //Ä£Ê½ÅäÖÃ ÃüÁîÄ£Ê½ÏÂÆô¶¯ÆøÑ¹²É¼¯
+#define MEAS_CFG_MEAS_CTR_COMMAND_TMP        0x02 //Ä£Ê½ÅäÖÃ ÃüÁîÄ£Ê½ÏÂÆô¶¯ÎÂ¶È²É¼¯
+#define MEAS_CFG_MEAS_CTR_BACKGROUND_PRS     0x05 //Ä£Ê½ÅäÖÃ ºóÌ¨Ä£Ê½Ö»¶ÁÈ¡ÆøÑ¹Öµ
+#define MEAS_CFG_MEAS_CTR_BACKGROUND_TMP     0X06 //Ä£Ê½ÅäÖÃ ºóÌ¨Ä£Ê½Ö»¶ÁÈ¡ÎÂ¶ÈÖµ
 #define MEAS_CFG_MEAS_CTR_BACKGROUND_PSR_TMP 0X07 //Ä£Ê½ÅäÖÃ ºóÌ¨Ä£Ê½Í¬Ê±¶ÁÈ¡ÎÂ¶ÈÖµºÍÆøÑ¹Öµ
 //»ñÈ¡´«¸ĞÆ÷Êı¾İ¾ÍÎ»×´Ì¬//´«¸ĞÆ÷¾ÍĞ÷×´Ì¬
-uint8_t SPL06_get_measure_status(void)
+uint8_t spl06_get_measure_status(void)
 {
-  return SPL06_001_read(SPL06_ADDR, MEAS_CFG_REG);
+  return spl0601_read(SPL06_ADDR, MEAS_CFG_REG);
 }
 //ÉèÖÃ¶ÁÈ¡Ä£Ê½+¶ÁÈ¡·½Ê½
-void SPL06_set_measure_mode(uint8_t mode)  //²ÎÊıÎªÄ£Ê½Öµ
+void spl06_set_measure_mode(uint8_t mode)  //²ÎÊıÎªÄ£Ê½Öµ
 {
-   SPL06_001_write(SPL06_ADDR, MEAS_CFG_REG,mode);
+   spl0601_write(SPL06_ADDR, MEAS_CFG_REG,mode);
 }
 //Æô¶¯ÃüÁîÄ£Ê½¶ÁÈ¡ÎÂ¶ÈÖµ
-void SPL06_start_temperature(void)
+void spl06_start_temperature(void)
 {
-    SPL06_001_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_COMMAND_TMP);
+    spl0601_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_COMMAND_TMP);
 }
 //Æô¶¯ÃüÁîÄ£Ê½¶ÁÈ¡ÆøÑ¹Öµ
-void SPL06_start_pressure(void)
+void spl06_start_pressure(void)
 {
-    SPL06_001_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_COMMAND_PRS);
+    spl0601_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_COMMAND_PRS);
 }
 //½øÈë´ı»úÄ£Ê½£¬½øÈëºóÍ£Ö¹²É¼¯Êı¾İÖ±µ½ÔÙ´ÎÇĞ»»Ä£Ê½
-void SPL06_enter_standby(void)
+void spl06_enter_standby(void)
 {
-    SPL06_001_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_STANDBY);
+    spl0601_write(SPL06_ADDR, MEAS_CFG_REG, MEAS_CFG_MEAS_CTR_STANDBY);
 }
 
 /***********************************************************************
@@ -237,44 +237,44 @@ void SPL06_enter_standby(void)
  * @param[out] 
  * @return     
  **********************************************************************/
-#define CFG_INT_LEVEL_ACTIVE_LOW 0//ÖĞ¶ÏµÍµçÆ½ÓĞĞ§
+#define CFG_INT_LEVEL_ACTIVE_LOW  0//ÖĞ¶ÏµÍµçÆ½ÓĞĞ§
 #define CFG_INT_LEVEL_ACTIVE_HIGH 1//ÖĞ¶Ï¸ßµçÆ½ÓĞĞ§
 #define CFG_INT_FIFO 0X40    //µ±FIFOÂúÊ¹ÄÜÖĞ¶Ï 
-#define CFG_INT_PRS 0X20    //µ±ÆøÑ¹¼Æ¶ÁÈ¡Íê±ÏÊ¹ÄÜÖĞ¶Ï 
-#define CFG_INT_TMP 0X10    //µ±ÎÂ¶È¶ÁÈ¡Íê±ÏÊ¹ÄÜÖĞ¶Ï 
-#define CFG_T_SHIFT 0X08    //ÔÊĞíÊı¾İ±»¸²¸Ç£¬¿ÉÒÔ½øĞĞÏÂÒ»±Ê²É¼¯
-#define CFG_P_SHIFT 0X04    //ÔÊĞíÊı¾İ±»¸²¸Ç£¬¿ÉÒÔ½øĞĞÏÂÒ»±Ê²É¼¯
-#define CFG_FIF 0X02    //Ê¹ÄÜFIFO
+#define CFG_INT_PRS  0X20    //µ±ÆøÑ¹¼Æ¶ÁÈ¡Íê±ÏÊ¹ÄÜÖĞ¶Ï 
+#define CFG_INT_TMP  0X10    //µ±ÎÂ¶È¶ÁÈ¡Íê±ÏÊ¹ÄÜÖĞ¶Ï 
+#define CFG_T_SHIFT  0X08    //ÔÊĞíÊı¾İ±»¸²¸Ç£¬¿ÉÒÔ½øĞĞÏÂÒ»±Ê²É¼¯
+#define CFG_P_SHIFT  0X04    //ÔÊĞíÊı¾İ±»¸²¸Ç£¬¿ÉÒÔ½øĞĞÏÂÒ»±Ê²É¼¯
+#define CFG_FIF      0X02    //Ê¹ÄÜFIFO
 #define CFG_SPI_3_WIRE 1    //3ÏßSPI
 #define CFG_SPI_4_WIRE 0    //4ÏßSPI
 
-void SPL06_set_interrupt(uint8_t interrupt,uint8_t type)//ÉèÖÃÖĞ¶ÏÊ¹ÄÜ
+void spl06_set_interrupt(uint8_t interrupt,uint8_t type)//ÉèÖÃÖĞ¶ÏÊ¹ÄÜ
 {
   uint8_t data;
-  data = SPL06_001_read(SPL06_ADDR, CFG_REG);
+  data = spl0601_read(SPL06_ADDR, CFG_REG);
   if(type!=ENABLE )
     data &= ~interrupt;
   else
     data |= interrupt;  
-  SPL06_001_write(SPL06_ADDR, CFG_REG,data);
+  spl0601_write(SPL06_ADDR, CFG_REG,data);
 }
 
-void SPL06_set_spi_wire(uint8_t wire)//ÉèÖÃSPIÏßÊı //3Ïß/4ÏßSPI¶ÁÈ¡Êı¾İ
+void spl06_set_spi_wire(uint8_t wire)//ÉèÖÃSPIÏßÊı //3Ïß/4ÏßSPI¶ÁÈ¡Êı¾İ
 {
   uint8_t data;
-  data = SPL06_001_read(SPL06_ADDR, CFG_REG);
+  data = spl0601_read(SPL06_ADDR, CFG_REG);
   data &= 0xf7;//SPIÏßÅäÖÃËùÔÚÎ»Çå0
   data |= wire;
-  SPL06_001_write(SPL06_ADDR, CFG_REG,data);
+  spl0601_write(SPL06_ADDR, CFG_REG,data);
 }
 
-void SPL06_set_intrupt_level(uint8_t level)//ÉèÖÃÖĞ¶ÏÓĞĞ§µçÆ½//INT¸ßµçÆ½ÓĞĞ§»òÕßµÍµçÆ½ÓĞĞ§//levelÎª0ÔòµÍµçÆ½ÓĞĞ§,Îª1Ôò¸ßµçÆ½ÓĞĞ§
+void spl06_set_intrupt_level(uint8_t level)//ÉèÖÃÖĞ¶ÏÓĞĞ§µçÆ½//INT¸ßµçÆ½ÓĞĞ§»òÕßµÍµçÆ½ÓĞĞ§//levelÎª0ÔòµÍµçÆ½ÓĞĞ§,Îª1Ôò¸ßµçÆ½ÓĞĞ§
 {
   uint8_t data;
-  data = SPL06_001_read(SPL06_ADDR, CFG_REG);
+  data = spl0601_read(SPL06_ADDR, CFG_REG);
   data &= 0x7f;//ÖĞ¶ÏµçÆ½ÓĞĞ§Î»Çå0
   data |= level<<7;
-  SPL06_001_write(SPL06_ADDR, CFG_REG,data);
+  spl0601_write(SPL06_ADDR, CFG_REG,data);
 }
 
 /***********************************************************************
@@ -283,13 +283,13 @@ void SPL06_set_intrupt_level(uint8_t level)//ÉèÖÃÖĞ¶ÏÓĞĞ§µçÆ½//INT¸ßµçÆ½ÓĞĞ§»òÕß
  * @param[out] 
  * @return     
  **********************************************************************/
-#define INT_STS_FIFO_FULL  0X04 //FIFOÂúÖĞ¶Ï×´Ì¬
-#define INT_STS_FIFO_TMP   0X02  //ÎÂ¶È²âÁ¿Íê³É±êÖ¾Î»
+#define INT_STS_FIFO_FULL 0X04 //FIFOÂúÖĞ¶Ï×´Ì¬
+#define INT_STS_FIFO_TMP  0X02  //ÎÂ¶È²âÁ¿Íê³É±êÖ¾Î»
 #define INT_STS_FIFO_PRS  0X01  //ÆøÑ¹²âÁ¿Íê³É±êÖ¾Î»
 
-uint8_t SPL06_get_int_status(void)//¶ÁÈ¡´«¸ĞÆ÷×´Ì¬
+uint8_t spl06_get_int_status(void)//¶ÁÈ¡´«¸ĞÆ÷×´Ì¬
 {
-  return SPL06_001_read(SPL06_ADDR, INT_STS_REG);
+  return spl0601_read(SPL06_ADDR, INT_STS_REG);
 }
 
 /***********************************************************************
@@ -299,10 +299,10 @@ uint8_t SPL06_get_int_status(void)//¶ÁÈ¡´«¸ĞÆ÷×´Ì¬
  * @return     
  **********************************************************************/
 #define FIFO_STS_FULL  0X02 //FIFOÂú
-#define FIFO_STS_EMPTY   0X01 //FIFO¿ÕÂú
-uint8_t SPL06_get_fifo_status(void)
+#define FIFO_STS_EMPTY 0X01 //FIFO¿ÕÂú
+uint8_t spl06_get_fifo_status(void)
 {
-  return SPL06_001_read(SPL06_ADDR, FIFO_STS_REG);
+  return spl0601_read(SPL06_ADDR, FIFO_STS_REG);
 }
 /***********************************************************************
  *¸´Î»
@@ -311,15 +311,15 @@ uint8_t SPL06_get_fifo_status(void)
  * @return     
  **********************************************************************/
 #define RESET_FIFO_FLUSH 0X80 //FIFOÇå0
-#define RESET_SOFT 0X09//Èí¼ş¸´Î»
+#define RESET_SOFT       0X09//Èí¼ş¸´Î»
 
-void SPL06_soft_reset(void)//Èí¼ş¸´Î»
+void spl06_soft_reset(void)//Èí¼ş¸´Î»
 {
-   SPL06_001_write(SPL06_ADDR,RESET_REG,RESET_SOFT);
+   spl0601_write(SPL06_ADDR,RESET_REG,RESET_SOFT);
 }
-void SPL06_reset_fifo(void)//Èí¼şÇåFIFO
+void spl06_reset_fifo(void)//Èí¼şÇåFIFO
 {
-  SPL06_001_write(SPL06_ADDR,RESET_REG,RESET_FIFO_FLUSH);
+  spl0601_write(SPL06_ADDR,RESET_REG,RESET_FIFO_FLUSH);
 }
 /***********************************************************************
  *ID
@@ -328,9 +328,9 @@ void SPL06_reset_fifo(void)//Èí¼şÇåFIFO
  * @return     
  **********************************************************************/
 #define PRODUCT_ID 0X10//²úÆ·ID
-uint8_t SPL06_get_chip_id(void)//»ñÈ¡²úÆ·ID//»ñÈ¡²úÆ·°æ±¾//ÓÉÓÚ°æ±¾ÔÚ²»Í¬µÄ´«¸ĞÆ÷ÓĞ²»Í¬£¬±¾Àı³ÌÖ»ÅĞ¶ÏIDÀ´Ê¶±ğSPL06
+uint8_t spl06_get_chip_id(void)//»ñÈ¡²úÆ·ID//»ñÈ¡²úÆ·°æ±¾//ÓÉÓÚ°æ±¾ÔÚ²»Í¬µÄ´«¸ĞÆ÷ÓĞ²»Í¬£¬±¾Àı³ÌÖ»ÅĞ¶ÏIDÀ´Ê¶±ğSPL06
 {
-  return SPL06_001_read(SPL06_ADDR, ID_REG);
+  return spl0601_read(SPL06_ADDR, ID_REG);
 }
 
 /***********************************************************************
@@ -339,44 +339,44 @@ uint8_t SPL06_get_chip_id(void)//»ñÈ¡²úÆ·ID//»ñÈ¡²úÆ·°æ±¾//ÓÉÓÚ°æ±¾ÔÚ²»Í¬µÄ´«¸ĞÆ
  * @param[out] 
  * @return     
  **********************************************************************/
-void SPL06_001_get_calib_param(void)//ÄÚ²¿Ğ£×¼Öµ//ÆøÑ¹¼Æ½âËãÒÔ¼°ÎÂ²¹Ê¹ÓÃ//ÓÉÄÚ²¿³ö³§Éè¶¨
+void spl0601_get_calib_param(void)//ÄÚ²¿Ğ£×¼Öµ//ÆøÑ¹¼Æ½âËãÒÔ¼°ÎÂ²¹Ê¹ÓÃ//ÓÉÄÚ²¿³ö³§Éè¶¨
 {
     unsigned long h;
     unsigned long m;
     unsigned long l;
-    h =  SPL06_001_read(SPL06_ADDR, 0x10);
-    l  =  SPL06_001_read(SPL06_ADDR, 0x11);
-    SPL06_calib_param.c0 = (int16_t)h<<4 | l>>4;
-    SPL06_calib_param.c0 = (SPL06_calib_param.c0&0x0800)?(0xF000|SPL06_calib_param.c0):SPL06_calib_param.c0;
-    h =  SPL06_001_read(SPL06_ADDR, 0x11);
-    l  =  SPL06_001_read(SPL06_ADDR, 0x12);
-    SPL06_calib_param.c1 = (int16_t)(h&0x0F)<<8 | l;
-    SPL06_calib_param.c1 = (SPL06_calib_param.c1&0x0800)?(0xF000|SPL06_calib_param.c1):SPL06_calib_param.c1;
-    h =  SPL06_001_read(SPL06_ADDR, 0x13);
-    m =  SPL06_001_read(SPL06_ADDR, 0x14);
-    l =  SPL06_001_read(SPL06_ADDR, 0x15);
-    SPL06_calib_param.c00 = (int32_t)h<<12 | (int32_t)m<<4 | (int32_t)l>>4;
-    SPL06_calib_param.c00 = (SPL06_calib_param.c00&0x080000)?(0xFFF00000|SPL06_calib_param.c00):SPL06_calib_param.c00;
-    h =  SPL06_001_read(SPL06_ADDR, 0x15);
-    m =  SPL06_001_read(SPL06_ADDR, 0x16);
-    l =  SPL06_001_read(SPL06_ADDR, 0x17);
-    SPL06_calib_param.c10 = (int32_t)h<<16 | (int32_t)m<<8 | l;
-    SPL06_calib_param.c10 = (SPL06_calib_param.c10&0x080000)?(0xFFF00000|SPL06_calib_param.c10):SPL06_calib_param.c10;
-    h =  SPL06_001_read(SPL06_ADDR, 0x18);
-    l  =  SPL06_001_read(SPL06_ADDR, 0x19);
-    SPL06_calib_param.c01 = (int16_t)h<<8 | l;
-    h =  SPL06_001_read(SPL06_ADDR, 0x1A);
-    l  =  SPL06_001_read(SPL06_ADDR, 0x1B);
-    SPL06_calib_param.c11 = (int16_t)h<<8 | l;
-    h =  SPL06_001_read(SPL06_ADDR, 0x1C);
-    l  =  SPL06_001_read(SPL06_ADDR, 0x1D);
-    SPL06_calib_param.c20 = (int16_t)h<<8 | l;
-    h =  SPL06_001_read(SPL06_ADDR, 0x1E);
-    l  =  SPL06_001_read(SPL06_ADDR, 0x1F);
-    SPL06_calib_param.c21 = (int16_t)h<<8 | l;
-    h =  SPL06_001_read(SPL06_ADDR, 0x20);
-    l  =  SPL06_001_read(SPL06_ADDR, 0x21);
-    SPL06_calib_param.c30 = (int16_t)h<<8 | l;
+    h =  spl0601_read(SPL06_ADDR, 0x10);
+    l  =  spl0601_read(SPL06_ADDR, 0x11);
+    spl06_calib_param.c0 = (int16_t)h<<4 | l>>4;
+    spl06_calib_param.c0 = (spl06_calib_param.c0&0x0800)?(0xF000|spl06_calib_param.c0):spl06_calib_param.c0;
+    h =  spl0601_read(SPL06_ADDR, 0x11);
+    l  =  spl0601_read(SPL06_ADDR, 0x12);
+    spl06_calib_param.c1 = (int16_t)(h&0x0F)<<8 | l;
+    spl06_calib_param.c1 = (spl06_calib_param.c1&0x0800)?(0xF000|spl06_calib_param.c1):spl06_calib_param.c1;
+    h =  spl0601_read(SPL06_ADDR, 0x13);
+    m =  spl0601_read(SPL06_ADDR, 0x14);
+    l =  spl0601_read(SPL06_ADDR, 0x15);
+    spl06_calib_param.c00 = (int32_t)h<<12 | (int32_t)m<<4 | (int32_t)l>>4;
+    spl06_calib_param.c00 = (spl06_calib_param.c00&0x080000)?(0xFFF00000|spl06_calib_param.c00):spl06_calib_param.c00;
+    h =  spl0601_read(SPL06_ADDR, 0x15);
+    m =  spl0601_read(SPL06_ADDR, 0x16);
+    l =  spl0601_read(SPL06_ADDR, 0x17);
+    spl06_calib_param.c10 = (int32_t)h<<16 | (int32_t)m<<8 | l;
+    spl06_calib_param.c10 = (spl06_calib_param.c10&0x080000)?(0xFFF00000|spl06_calib_param.c10):spl06_calib_param.c10;
+    h =  spl0601_read(SPL06_ADDR, 0x18);
+    l  =  spl0601_read(SPL06_ADDR, 0x19);
+    spl06_calib_param.c01 = (int16_t)h<<8 | l;
+    h =  spl0601_read(SPL06_ADDR, 0x1A);
+    l  =  spl0601_read(SPL06_ADDR, 0x1B);
+    spl06_calib_param.c11 = (int16_t)h<<8 | l;
+    h =  spl0601_read(SPL06_ADDR, 0x1C);
+    l  =  spl0601_read(SPL06_ADDR, 0x1D);
+    spl06_calib_param.c20 = (int16_t)h<<8 | l;
+    h =  spl0601_read(SPL06_ADDR, 0x1E);
+    l  =  spl0601_read(SPL06_ADDR, 0x1F);
+    spl06_calib_param.c21 = (int16_t)h<<8 | l;
+    h =  spl0601_read(SPL06_ADDR, 0x20);
+    l  =  spl0601_read(SPL06_ADDR, 0x21);
+    spl06_calib_param.c30 = (int16_t)h<<8 | l;
 }
 /***********************************************************************
  * ³õÊ¼»¯
@@ -384,39 +384,39 @@ void SPL06_001_get_calib_param(void)//ÄÚ²¿Ğ£×¼Öµ//ÆøÑ¹¼Æ½âËãÒÔ¼°ÎÂ²¹Ê¹ÓÃ//ÓÉÄÚ²¿
  * @param[out] 
  * @return     
  **********************************************************************/
-uint8_t SPL06_001_init(void)
+uint8_t spl0601_init(void)
 {
-    uint8_t SPL06_start_status;
+    uint8_t spl06_start_status;
     //µÈ´ıÄÚ²¿Ğ£×¼Êı¾İ¿ÉÓÃ, ³¬Ê±ÍË³ö
     uint8_t tickstart=HAL_GetTick();
     do
-    { SPL06_start_status = SPL06_get_measure_status();//¶ÁÈ¡ÆøÑ¹¼ÆÆô¶¯×´Ì¬
+    { spl06_start_status = spl06_get_measure_status();//¶ÁÈ¡ÆøÑ¹¼ÆÆô¶¯×´Ì¬
       if(HAL_GetTick()-tickstart>200)
         return ERROR;
     }
-    while((SPL06_start_status&MEAS_CFG_COEF_RDY)!=MEAS_CFG_COEF_RDY);
+    while((spl06_start_status&MEAS_CFG_COEF_RDY)!=MEAS_CFG_COEF_RDY);
     //¶ÁÈ¡ÄÚ²¿Ğ£×¼Öµ  
-    SPL06_001_get_calib_param();
+    spl0601_get_calib_param();
     
     //µÈ´ı´«¸ĞÆ÷ÄÚ²¿³õÊ¼»¯Íê³É, ³¬Ê±ÍË³ö
     tickstart=HAL_GetTick();
     do
-    { SPL06_start_status = SPL06_get_measure_status();//¶ÁÈ¡ÆøÑ¹¼ÆÆô¶¯×´Ì¬
+    { spl06_start_status = spl06_get_measure_status();//¶ÁÈ¡ÆøÑ¹¼ÆÆô¶¯×´Ì¬
       if(HAL_GetTick()-tickstart>200)
         return ERROR;
     }   
-    while((SPL06_start_status&MEAS_CFG_SENSOR_RDY)!=MEAS_CFG_SENSOR_RDY);
+    while((spl06_start_status&MEAS_CFG_SENSOR_RDY)!=MEAS_CFG_SENSOR_RDY);
     //¶ÁÈ¡CHIP ID
-    SPL06.chip_id = SPL06_get_chip_id();
+    spl06.chip_id = spl06_get_chip_id();
     //ÅĞ¶Ï¶ÁÈ¡µÄIDÊÇ·ñÕıÈ·£¬ÕâÀïÖ»ÅĞ¶Ï¸ß4Î»µÄID£¬²»ÅĞ¶ÏµÍ4Î»µÄ°æ±¾ºÅ
-    if((SPL06.chip_id&0xf0)!=PRODUCT_ID)
+    if((spl06.chip_id&0xf0)!=PRODUCT_ID)
       return FAILED;//Èç¹ûID¶ÁÈ¡Ê§°Ü£¬Ôò·µ»ØÊ§°Ü
     //ºóÌ¨Êı¾İ²ÉÑùËÙÂÊ128HZ ¹ı²ÉÑùÂÊ32´Î
-    SPL06_pressure_rate_config(PRESSURE_RATE_128_TIMES,PRESSURE_RATE_64_TIMES);
+    spl06_pressure_rate_config(PRESSURE_RATE_128_TIMES,PRESSURE_RATE_64_TIMES);
     //ºóÌ¨Êı¾İ²ÉÑùËÙÂÊ32HZ ¹ı²ÉÑùÂÊ8´Î//ÉèÖÃ´«¸ĞÆ÷ÉÏµÄÎÂ¶È¼Æ×÷ÎªÎÂ¶È²É¼¯
-    SPL06_temperature_rate_config(TEMPERATURE_RATE_32_TIMES,TEMPERATURE_RATE_8_TIMES,TEMPERATURE_RATE_TMP_EXT_EXTERNAL);
+    spl06_temperature_rate_config(TEMPERATURE_RATE_32_TIMES,TEMPERATURE_RATE_8_TIMES,TEMPERATURE_RATE_TMP_EXT_EXTERNAL);
     //Æô¶¯ºóÌ¨¶ÁÈ¡Êı¾İ
-    SPL06_set_measure_mode(MEAS_CFG_MEAS_CTR_BACKGROUND_PSR_TMP);
+    spl06_set_measure_mode(MEAS_CFG_MEAS_CTR_BACKGROUND_PSR_TMP);
     return SUCCESS;//³õÊ¼»¯³É¹¦
 }
 
@@ -427,16 +427,16 @@ uint8_t SPL06_001_init(void)
  * @param[out] 
  * @return     
  **********************************************************************/
-void SPL06_001_get_raw_temp(void)
+void spl0601_get_raw_temp(void)
 {
     uint8_t h[3] = {0};
     
-    h[0] = SPL06_001_read(SPL06_ADDR, 0x03);
-    h[1] = SPL06_001_read(SPL06_ADDR, 0x04);
-    h[2] = SPL06_001_read(SPL06_ADDR, 0x05);
+    h[0] = spl0601_read(SPL06_ADDR, 0x03);
+    h[1] = spl0601_read(SPL06_ADDR, 0x04);
+    h[2] = spl0601_read(SPL06_ADDR, 0x05);
 
-    SPL06.i32rawTemperature = (int32_t)h[0]<<16 | (int32_t)h[1]<<8 | (int32_t)h[2];
-    SPL06.i32rawTemperature= (SPL06.i32rawTemperature&0x800000) ? (0xFF000000|SPL06.i32rawTemperature) : SPL06.i32rawTemperature;
+    spl06.i32rawTemperature = (int32_t)h[0]<<16 | (int32_t)h[1]<<8 | (int32_t)h[2];
+    spl06.i32rawTemperature= (spl06.i32rawTemperature&0x800000) ? (0xFF000000|spl06.i32rawTemperature) : spl06.i32rawTemperature;
 }
 
 /***********************************************************************
@@ -445,16 +445,16 @@ void SPL06_001_get_raw_temp(void)
  * @param[out] 
  * @return     
  **********************************************************************/
-void SPL06_001_get_raw_pressure(void)
+void spl0601_get_raw_pressure(void)
 {
     uint8_t h[3];
     
-    h[0] = SPL06_001_read(SPL06_ADDR, 0x00);
-    h[1] = SPL06_001_read(SPL06_ADDR, 0x01);
-    h[2] = SPL06_001_read(SPL06_ADDR, 0x02);
+    h[0] = spl0601_read(SPL06_ADDR, 0x00);
+    h[1] = spl0601_read(SPL06_ADDR, 0x01);
+    h[2] = spl0601_read(SPL06_ADDR, 0x02);
     
-    SPL06.i32rawPressure = (int32_t)h[0]<<16 | (int32_t)h[1]<<8 | (int32_t)h[2];
-    SPL06.i32rawPressure= (SPL06.i32rawPressure&0x800000) ? (0xFF000000|SPL06.i32rawPressure) : SPL06.i32rawPressure;
+    spl06.i32rawPressure = (int32_t)h[0]<<16 | (int32_t)h[1]<<8 | (int32_t)h[2];
+    spl06.i32rawPressure= (spl06.i32rawPressure&0x800000) ? (0xFF000000|spl06.i32rawPressure) : spl06.i32rawPressure;
 }
 
 
@@ -464,13 +464,13 @@ void SPL06_001_get_raw_pressure(void)
  * @param[out] 
  * @return     
  **********************************************************************/
-float SPL06_001_get_temperature(void)
+float spl0601_get_temperature(void)
 {
     float fTCompensate;
     float fTsc;
 
-    fTsc = SPL06.i32rawTemperature / (float)SPL06.i32kT;
-    fTCompensate =  SPL06_calib_param.c0 * 0.5 + SPL06_calib_param.c1 * fTsc;
+    fTsc = spl06.i32rawTemperature / (float)spl06.i32kT;
+    fTCompensate =  spl06_calib_param.c0 * 0.5 + spl06_calib_param.c1 * fTsc;
     return fTCompensate;
 }
 
@@ -480,20 +480,20 @@ float SPL06_001_get_temperature(void)
  * @param[out] 
  * @return     
  **********************************************************************/
-float SPL06_001_get_pressure(void)
+float spl0601_get_pressure(void)
 {
     float fTsc, fPsc;
     float qua2, qua3;
     float fPCompensate;
 
-    fTsc = SPL06.i32rawTemperature / (float)SPL06.i32kT;
-    fPsc = SPL06.i32rawPressure / (float)SPL06.i32kP;
-    qua2 = SPL06_calib_param.c10 + fPsc * (SPL06_calib_param.c20 + fPsc* SPL06_calib_param.c30);
-    qua3 = fTsc * fPsc * (SPL06_calib_param.c11 + fPsc * SPL06_calib_param.c21);
-    //qua3 = 0.9f *fTsc * fPsc * (SPL06_calib_param.c11 + fPsc * SPL06_calib_param.c21);
+    fTsc = spl06.i32rawTemperature / (float)spl06.i32kT;
+    fPsc = spl06.i32rawPressure / (float)spl06.i32kP;
+    qua2 = spl06_calib_param.c10 + fPsc * (spl06_calib_param.c20 + fPsc* spl06_calib_param.c30);
+    qua3 = fTsc * fPsc * (spl06_calib_param.c11 + fPsc * spl06_calib_param.c21);
+    //qua3 = 0.9f *fTsc * fPsc * (spl06_calib_param.c11 + fPsc * spl06_calib_param.c21);
   
-    fPCompensate = SPL06_calib_param.c00 + fPsc * qua2 + fTsc * SPL06_calib_param.c01 + qua3;
-    //fPCompensate = SPL06_calib_param.c00 + fPsc * qua2 + 0.9f *fTsc  * SPL06_calib_param.c01 + qua3;
+    fPCompensate = spl06_calib_param.c00 + fPsc * qua2 + fTsc * spl06_calib_param.c01 + qua3;
+    //fPCompensate = spl06_calib_param.c00 + fPsc * qua2 + 0.9f *fTsc  * spl06_calib_param.c01 + qua3;
     return fPCompensate;
 }
 
@@ -505,10 +505,10 @@ float SPL06_001_get_pressure(void)
  * @param[out] 
  * @return     
  **********************************************************************/
-float user_SPL06_001_get_temperature()
+float user_spl0601_get_temperature()
 {
-    SPL06_001_get_raw_temp();//¶ÁÈ¡ÎÂ¶ÈÔ­Ê¼Öµ
-    return SPL06_001_get_temperature();//ÎÂ¶È½âËãºóµÄÖµ
+    spl0601_get_raw_temp();//¶ÁÈ¡ÎÂ¶ÈÔ­Ê¼Öµ
+    return spl0601_get_temperature();//ÎÂ¶È½âËãºóµÄÖµ
 }
 /***********************************************************************
  * »ñÈ¡ÆøÑ¹¼ÆÎÂ¶È²¹³¥Öµ
@@ -516,10 +516,10 @@ float user_SPL06_001_get_temperature()
  * @param[out] 
  * @return     
  **********************************************************************/
-float user_SPL06_001_get_presure()
+float user_spl0601_get_presure()
 {
-    SPL06_001_get_raw_pressure();//¶ÁÈ¡ÆøÑ¹ÖµÔ­Ê¼Öµ
-    return SPL06_001_get_pressure();  //ÆøÑ¹½âËã²¢¾­¹ıÎÂ¶È²¹³¥ºóµÄÆøÑ¹Öµ
+    spl0601_get_raw_pressure();//¶ÁÈ¡ÆøÑ¹ÖµÔ­Ê¼Öµ
+    return spl0601_get_pressure();  //ÆøÑ¹½âËã²¢¾­¹ıÎÂ¶È²¹³¥ºóµÄÆøÑ¹Öµ
 }
 
 #endif

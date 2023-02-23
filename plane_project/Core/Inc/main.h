@@ -66,6 +66,7 @@ void Error_Handler(void);
 #define nRF24L01_CE_GPIO_Port GPIOB
 #define nRF24L01_IRQ_Pin GPIO_PIN_10
 #define nRF24L01_IRQ_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -75,5 +76,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

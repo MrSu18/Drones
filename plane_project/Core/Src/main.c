@@ -59,6 +59,7 @@ short aacx,aacy,aacz;		//加速度传感器原始数据
 short gyrox,gyroy,gyroz;	//陀螺仪原始数据
 short temp;					//温度
 float presure=0;//气压
+int32_t baro_height;//海拔
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -105,11 +106,14 @@ int main(void)
   MX_TIM3_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(250);
   //初始化气压传感器
-  while(SPL06_001_init()!=0)
+  while(spl0601_init()!=SUCCESS)//SPL06初始化未成功
   {
-	  printf("ERROR\r\n");
-  }
+    printf("SPL06-001初始化失败\r\n");
+    HAL_Delay(500);
+  }; 
+  printf("SPL06-001初始化成功\r\n");
   //初始化MPU6050
 //  while(MPU_Init());					
 //  while(mpu_dmp_init())
@@ -124,8 +128,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  presure=user_SPL06_001_get_presure();
-	  printf("%f\r\n",presure);
+     presure = user_spl0601_get_presure(); 
+     baro_height = (int32_t)((102000.0f- presure) * 78.740f);  //每1mpar平均海拔高度为78.740mm
+	 printf("%f,%d\r\n",presure,baro_height);
 //	if(mpu_dmp_get_data(&pitch,&roll,&yaw)==0)
 //	{
 //		//temp=MPU_Get_Temperature();				//得到温度值
@@ -154,6 +159,7 @@ void SystemClock_Config(void)
   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -170,6 +176,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -220,5 +227,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
