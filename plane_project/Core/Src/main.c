@@ -108,7 +108,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_Delay(250);
   //初始化气压传感器
-  while(spl0601_init()!=SUCCESS)//SPL06初始化未成功
+  while(spl0601_init()!=0)//SPL06初始化未成功
   {
     printf("SPL06-001初始化失败\r\n");
     HAL_Delay(500);
@@ -130,7 +130,7 @@ int main(void)
   {
      presure = user_spl0601_get_presure(); 
      baro_height = (int32_t)((102000.0f- presure) * 78.740f);  //每1mpar平均海拔高度为78.740mm
-	 printf("%f,%d\r\n",presure,baro_height);
+	 printf("%9.2f,%6d\r\n",presure,baro_height);
 //	if(mpu_dmp_get_data(&pitch,&roll,&yaw)==0)
 //	{
 //		//temp=MPU_Get_Temperature();				//得到温度值

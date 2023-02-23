@@ -16,16 +16,16 @@ extern I2C_HandleTypeDef hi2c1;
 
 //寄存器定义
 #define PRESSURE_REG 0X00
-#define TEMP_REG     0X03
-#define PRS_CFG_REG  0x06 //气压测量速率配置
-#define TMP_CFG_REG  0x07 //温度测量速度配置
+#define TEMP_REG 0X03
+#define PRS_CFG_REG 0x06 //气压测量速率配置
+#define TMP_CFG_REG 0x07 //温度测量速度配置
 #define MEAS_CFG_REG 0x08 //测量配置与传感器配置
-#define CFG_REG      0x09 //中断/FIFO/SPI线数等配置
-#define INT_STS_REG  0X0A //中断状态标志位
+#define CFG_REG 0x09 //中断/FIFO/SPI线数等配置
+#define INT_STS_REG 0X0A //中断状态标志位
 #define FIFO_STS_REG 0X0B //FIFO状态
-#define RESET_REG    0X0C
-#define ID_REG       0x0D
-#define COEF_REG     0x10
+#define RESET_REG 0X0C
+#define ID_REG 0x0D
+#define COEF_REG 0x10
 
 //#define HW_ADR 0x77 //SDO HIGH OR NC//当SDO拉高或者浮空使用的I2C地址
 //#define HW_ADR 0x76 //SDO LOW//当SDO拉低使用的I2C地址
@@ -47,11 +47,11 @@ static struct  {  //内部出厂校准数据
 
 
 struct  {  
-    uint8_t chip_id;          //<chip id  
-    int32_t i32rawPressure;   //原始气压数据
+    uint8_t chip_id; /**<chip id*/  
+    int32_t i32rawPressure;//原始气压数据
     int32_t i32rawTemperature;//原始温度数据
-    int32_t i32kP;            //气压补偿参数
-    int32_t i32kT;            //温度补偿参数
+    int32_t i32kP;    //气压补偿参数
+    int32_t i32kT;//温度补偿参数
 }spl06;
 
 
@@ -79,13 +79,13 @@ uint8_t spl0601_read(uint8_t hwadr, uint8_t regadr)
  * @param[out] 
  * @return     
  **********************************************************************/
-#define PRESSURE_RATE_1_TIMES   0 //采样率 
-#define PRESSURE_RATE_2_TIMES   1
-#define PRESSURE_RATE_4_TIMES   2
-#define PRESSURE_RATE_8_TIMES   3
-#define PRESSURE_RATE_16_TIMES  4
-#define PRESSURE_RATE_32_TIMES  5
-#define PRESSURE_RATE_64_TIMES  6
+#define PRESSURE_RATE_1_TIMES 0 //采样率 
+#define PRESSURE_RATE_2_TIMES 1
+#define PRESSURE_RATE_4_TIMES 2
+#define PRESSURE_RATE_8_TIMES 3
+#define PRESSURE_RATE_16_TIMES 4
+#define PRESSURE_RATE_32_TIMES 5
+#define PRESSURE_RATE_64_TIMES 6
 #define PRESSURE_RATE_128_TIMES 7
 
 void spl06_pressure_rate_config(uint8_t background_rate,uint8_t oversamply)
@@ -137,13 +137,13 @@ void spl06_pressure_rate_config(uint8_t background_rate,uint8_t oversamply)
  * @param[out] 
  * @return     
  **********************************************************************/
-#define TEMPERATURE_RATE_1_TIMES   0 //采样率
-#define TEMPERATURE_RATE_2_TIMES   1
-#define TEMPERATURE_RATE_4_TIMES   2
-#define TEMPERATURE_RATE_8_TIMES   3
-#define TEMPERATURE_RATE_16_TIMES  4
-#define TEMPERATURE_RATE_32_TIMES  5
-#define TEMPERATURE_RATE_64_TIMES  6
+#define TEMPERATURE_RATE_1_TIMES 0 //采样率
+#define TEMPERATURE_RATE_2_TIMES 1
+#define TEMPERATURE_RATE_4_TIMES 2
+#define TEMPERATURE_RATE_8_TIMES 3
+#define TEMPERATURE_RATE_16_TIMES 4
+#define TEMPERATURE_RATE_32_TIMES 5
+#define TEMPERATURE_RATE_64_TIMES 6
 #define TEMPERATURE_RATE_128_TIMES 7
 #define TEMPERATURE_RATE_TMP_EXT_INTERNAL 0  //集成电路上的温度计
 #define TEMPERATURE_RATE_TMP_EXT_EXTERNAL 1  //传感器MEMS气压芯片上温度计
@@ -195,15 +195,15 @@ void spl06_temperature_rate_config(uint8_t background_rate,uint8_t oversamply,ui
  * @param[out] 
  * @return     
  **********************************************************************/
-#define MEAS_CFG_COEF_RDY   0X80 // 传感器内部校准值可读，在启动后
+#define MEAS_CFG_COEF_RDY 0X80 // 传感器内部校准值可读，在启动后
 #define MEAS_CFG_SENSOR_RDY 0X40 // 传感器已初始化完成，在启动后
-#define MEAS_CFG_TMP_RDY    0x20 //温度值已经准备就绪，可以进行读取，该标志位读取后自动清0
-#define MEAS_CFG_PRS_RDY    0x10 //气压值已经准备就绪，可以进行读取，该标志位
-#define MEAS_CFG_MEAS_CTR_STANDBY            0x00 //模式配置 挂起模式
-#define MEAS_CFG_MEAS_CTR_COMMAND_PRS        0x01 //模式配置 命令模式下启动气压采集
-#define MEAS_CFG_MEAS_CTR_COMMAND_TMP        0x02 //模式配置 命令模式下启动温度采集
-#define MEAS_CFG_MEAS_CTR_BACKGROUND_PRS     0x05 //模式配置 后台模式只读取气压值
-#define MEAS_CFG_MEAS_CTR_BACKGROUND_TMP     0X06 //模式配置 后台模式只读取温度值
+#define MEAS_CFG_TMP_RDY 0x20 //温度值已经准备就绪，可以进行读取，该标志位读取后自动清0
+#define MEAS_CFG_PRS_RDY 0x10 //气压值已经准备就绪，可以进行读取，该标志位
+#define MEAS_CFG_MEAS_CTR_STANDBY 0 //模式配置 挂起模式
+#define MEAS_CFG_MEAS_CTR_COMMAND_PRS 0x01 //模式配置 命令模式下启动气压采集
+#define MEAS_CFG_MEAS_CTR_COMMAND_TMP 0x02 //模式配置 命令模式下启动温度采集
+#define MEAS_CFG_MEAS_CTR_BACKGROUND_PRS 0x05 //模式配置 后台模式只读取气压值
+#define MEAS_CFG_MEAS_CTR_BACKGROUND_TMP 0X06 //模式配置 后台模式只读取温度值
 #define MEAS_CFG_MEAS_CTR_BACKGROUND_PSR_TMP 0X07 //模式配置 后台模式同时读取温度值和气压值
 //获取传感器数据就位状态//传感器就绪状态
 uint8_t spl06_get_measure_status(void)
@@ -237,14 +237,14 @@ void spl06_enter_standby(void)
  * @param[out] 
  * @return     
  **********************************************************************/
-#define CFG_INT_LEVEL_ACTIVE_LOW  0//中断低电平有效
+#define CFG_INT_LEVEL_ACTIVE_LOW 0//中断低电平有效
 #define CFG_INT_LEVEL_ACTIVE_HIGH 1//中断高电平有效
 #define CFG_INT_FIFO 0X40    //当FIFO满使能中断 
-#define CFG_INT_PRS  0X20    //当气压计读取完毕使能中断 
-#define CFG_INT_TMP  0X10    //当温度读取完毕使能中断 
-#define CFG_T_SHIFT  0X08    //允许数据被覆盖，可以进行下一笔采集
-#define CFG_P_SHIFT  0X04    //允许数据被覆盖，可以进行下一笔采集
-#define CFG_FIF      0X02    //使能FIFO
+#define CFG_INT_PRS 0X20    //当气压计读取完毕使能中断 
+#define CFG_INT_TMP 0X10    //当温度读取完毕使能中断 
+#define CFG_T_SHIFT 0X08    //允许数据被覆盖，可以进行下一笔采集
+#define CFG_P_SHIFT 0X04    //允许数据被覆盖，可以进行下一笔采集
+#define CFG_FIF 0X02    //使能FIFO
 #define CFG_SPI_3_WIRE 1    //3线SPI
 #define CFG_SPI_4_WIRE 0    //4线SPI
 
@@ -283,8 +283,8 @@ void spl06_set_intrupt_level(uint8_t level)//设置中断有效电平//INT高电平有效或者
  * @param[out] 
  * @return     
  **********************************************************************/
-#define INT_STS_FIFO_FULL 0X04 //FIFO满中断状态
-#define INT_STS_FIFO_TMP  0X02  //温度测量完成标志位
+#define INT_STS_FIFO_FULL  0X04 //FIFO满中断状态
+#define INT_STS_FIFO_TMP   0X02  //温度测量完成标志位
 #define INT_STS_FIFO_PRS  0X01  //气压测量完成标志位
 
 uint8_t spl06_get_int_status(void)//读取传感器状态
@@ -299,7 +299,7 @@ uint8_t spl06_get_int_status(void)//读取传感器状态
  * @return     
  **********************************************************************/
 #define FIFO_STS_FULL  0X02 //FIFO满
-#define FIFO_STS_EMPTY 0X01 //FIFO空满
+#define FIFO_STS_EMPTY   0X01 //FIFO空满
 uint8_t spl06_get_fifo_status(void)
 {
   return spl0601_read(SPL06_ADDR, FIFO_STS_REG);
@@ -311,7 +311,7 @@ uint8_t spl06_get_fifo_status(void)
  * @return     
  **********************************************************************/
 #define RESET_FIFO_FLUSH 0X80 //FIFO清0
-#define RESET_SOFT       0X09//软件复位
+#define RESET_SOFT 0X09//软件复位
 
 void spl06_soft_reset(void)//软件复位
 {
