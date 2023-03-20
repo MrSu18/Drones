@@ -1838,6 +1838,11 @@
               <FileType>1</FileType>
               <FilePath>..\Hardware\hc_sr04.c</FilePath>
             </File>
+            <File>
+              <FileName>NRF24L01.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\NRF24L01.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
