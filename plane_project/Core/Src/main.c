@@ -105,40 +105,54 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   MX_SPI1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(250);
   //初始化气压传感器
-  while(spl0601_init()!=0)//SPL06初始化未成功
-  {
-    printf("SPL06-001初始化失败\r\n");
-    HAL_Delay(500);
-  }; 
-  printf("SPL06-001初始化成功\r\n");
-  //初始化MPU6050
-//  while(MPU_Init());					
-//  while(mpu_dmp_init())
+//  while(spl0601_init()!=0)//SPL06初始化未成功
 //  {
-//	HAL_Delay(200);
-//	printf("%s\r\n","Mpu6050 Init Wrong!");
-//  }
-//  printf("%s\r\n","Mpu6050 Init OK!");
+//    printf("SPL06-001初始化失败\r\n");
+//    HAL_Delay(500);
+//  }; 
+//  printf("SPL06-001初始化成功\r\n");
+  //初始化MPU6050
+  while(MPU_Init())
+  {
+	  printf("初始化失败\r\n");
+  };					
+  while(mpu_dmp_init())
+  {
+	HAL_Delay(200);
+	printf("%s\r\n","Mpu6050 Init Wrong!");
+  }
+  printf("%s\r\n","Mpu6050 Init OK!");
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-     presure = user_spl0601_get_presure(); 
-     baro_height = (int32_t)((102000.0f- presure) * 78.740f);  //每1mpar平均海拔高度为78.740mm
-	 printf("%9.2f,%6d\r\n",presure,baro_height);
-//	if(mpu_dmp_get_data(&pitch,&roll,&yaw)==0)
+	  //气压计测试
+//     presure = user_spl0601_get_presure(); 
+//     baro_height = (int32_t)((102000.0f- presure) * 78.740f);  //每1mpar平均海拔高度为78.740mm
+//	 printf("%9.2f,%6d\r\n",presure,baro_height);
+	  //陀螺仪测试
+//	if(MPU_Get_Accelerometer(&aacx,&aacy,&aacz)==0)
 //	{
-//		//temp=MPU_Get_Temperature();				//得到温度值
+//		printf("%d,%d,%d\r\n",aacx,aacy,aacz);
+//	}
+	if(mpu_dmp_get_data(&pitch,&roll,&yaw)==0)
+	{
+		//temp=MPU_Get_Temperature();				//得到温度值
 //		MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
 //		MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
-//		
-//		printf(" Roll:%f\r\n",roll);
-//	}
+		
+		printf("%f,%f,%f\r\n",pitch,roll,yaw);
+	}
+	else
+	{
+		printf("error\r\n");
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

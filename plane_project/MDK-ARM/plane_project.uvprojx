@@ -538,36 +538,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Hardware</GroupName>
-          <Files>
-            <File>
-              <FileName>my_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\my_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>mpu6050.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\MPU6050\mpu6050.c</FilePath>
-            </File>
-            <File>
-              <FileName>inv_mpu_dmp_motion_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\MPU6050\eMPL\inv_mpu_dmp_motion_driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>inv_mpu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\MPU6050\eMPL\inv_mpu.c</FilePath>
-            </File>
-            <File>
-              <FileName>SPL06_001.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\SPL06_001.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Drivers/STM32F4xx_HAL_Driver</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1832,6 +1802,41 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Hardware</GroupName>
+          <Files>
+            <File>
+              <FileName>my_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\my_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\MPU6050\mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu_dmp_motion_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\MPU6050\eMPL\inv_mpu_dmp_motion_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\MPU6050\eMPL\inv_mpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>SPL06_001.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\SPL06_001.c</FilePath>
+            </File>
+            <File>
+              <FileName>hc_sr04.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\hc_sr04.c</FilePath>
             </File>
           </Files>
         </Group>
