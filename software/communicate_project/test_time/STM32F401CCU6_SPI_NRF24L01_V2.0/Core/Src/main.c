@@ -45,8 +45,8 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 uint8_t nrf2401_tx_flag=0;
-uint8_t nrf2401_txbuf[33];
-uint8_t txbuf_pos=0;
+uint8_t nrf2401_txbuf[33]={0};
+uint8_t txbuf_pos=32;
 uint32_t time=0,time1=0,time2=0;
 uint8_t time_flag=0;
 /* USER CODE END PV */
@@ -68,10 +68,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)  //NRF2401_IRQ引脚中断
   if(GPIO_Pin==NRF24L01_IRQ_Pin)
   {
     time2=micros();
-    if(time_flag==20)
+    if(time_flag==10)
     {
-      time=time/20;
-      printf("time1:%d,time2:%d,time:%d\r\n",time1,time2,time);
+      time=time/10;
+      printf("%d\r\n",time);
       time_flag=0;
     }
     else
@@ -79,7 +79,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)  //NRF2401_IRQ引脚中断
       time+=(time2-time1);
       time_flag++;
     }
-    
     time1=0;
     len=NRF24L01_RxPacket(tmp_buf); //返回收到的字节数,收到的len个字节数据存在tmp_buf中
     if(len>0)//一旦接收到信息,则串口发送出去.
@@ -88,11 +87,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)  //NRF2401_IRQ引脚中断
       //tmp_buf[len++]='\n';
       tmp_buf[len+1]=0;
       //send_str(&huart1,tmp_buf);
-      send_char_array(&huart1,tmp_buf,len);
+      // send_char_array(&huart1,tmp_buf,len);
       HAL_GPIO_TogglePin(LED0_GPIO_Port,LED0_Pin);
       HAL_GPIO_TogglePin(LED1_GPIO_Port,LED2_Pin);
       //__HAL_GPIO_EXTI_CLEAR_IT(NRF24L01_IRQ_Pin);
     }
+    nrf2401_tx_flag=1;
   }
 }
 
@@ -167,7 +167,7 @@ int main(void)
       }
       //else  //发送失败
         //HAL_Delay(10); //延时10ms，随后重新进入上面的if,重新发送。
-      txbuf_pos=0; //长度清0
+      // txbuf_pos=0; //长度清0
       nrf2401_tx_flag=0; //标志位清0
       RX_Mode(); //NRF24L01切换到接收模式
     }
