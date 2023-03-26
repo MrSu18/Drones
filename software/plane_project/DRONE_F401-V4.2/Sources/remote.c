@@ -40,6 +40,37 @@ uint16_t nrf_cnt=0;
 uint8_t RC_rxData[32];
 extern UART_HandleTypeDef huart6;
 
+uint8_t CheckSum=0;
+
+extern uint8_t nrf2401_txbuf[];
+extern uint8_t txbuf_pos;
+
+/*对于地面站写入PID参数的命令返回确认帧*/
+static void Check(uint8_t num)
+{
+  uint8_t check_buff[7];
+  check_buff[0]=0xaa;
+  check_buff[1]=0xaa;
+  check_buff[2]=0xef;
+  check_buff[3]=0x02; //LEN
+  check_buff[4]=num;  //PID分组序号
+  /*CHECK_SUM*/
+  check_buff[5]=(uint8_t)CheckSum;
+  /*SUM*/
+  int sum=0;
+  for (int i = 0; i < 6; i++)
+  {
+    sum+=check_buff[i];
+  }
+  check_buff[6]=(uint8_t)sum;
+  /*存入缓冲区*/
+  for (int i = 0; i < 7; i++)
+  {
+    nrf2401_txbuf[i]=check_buff[i];
+  }
+  txbuf_pos=7;
+}
+
 void remote_unlock(void);  
 void RC_Analy(void)  
 { 
@@ -53,7 +84,8 @@ void RC_Analy(void)
   if(rxlen>0)
   { 
     uint8_t i;
-    uint8_t CheckSum=0;
+    // uint8_t CheckSum=0;  //修改为全局变量用于返回确认帧
+    CheckSum=0;
     //send_char_array(&huart6,RC_rxData,rxlen);
     nrf_cnt = 0;
     for(i=0;i<rxlen-1;i++)
@@ -148,16 +180,32 @@ void RC_Analy(void)
               break;
           case 0x10: //上位机通过遥控器转发的设置PID参数命令
               ANO_Recive(RC_rxData);
+              Check(0x10);
               LED.status=DANGEROURS;
               break;
           case 0x11: //上位机通过遥控器转发的设置PID参数命令
               ANO_Recive(RC_rxData);
+              Check(0x11);
               LED.status=DANGEROURS;
               break;
           case 0x12: //上位机通过遥控器转发的设置PID参数命令
               ANO_Recive(RC_rxData);
+              Check(0x12);
               LED.status=DANGEROURS;
               break;
+          case 0x13: //设置PID4
+              ANO_Recive(RC_rxData);
+              Check(0x13);
+              break;
+          case 0x14: //设置PID5
+              ANO_Recive(RC_rxData);
+              Check(0x14);
+              break;
+          case 0x15: //设置PID6
+              ANO_Recive(RC_rxData);
+              Check(0x15);
+              break;
+          default:break;
         }
       } 
     }

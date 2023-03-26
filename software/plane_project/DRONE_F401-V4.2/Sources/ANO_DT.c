@@ -258,11 +258,11 @@ void ANTO_polling(void) //轮询扫描上位机端口
       if(ANTO_Recived_flag.CMD2_READ_PID) //判断上位机是否请求发发送飞控PID数据到上位机
       {    
         ANTO_Send(ANTO_RATE_PID);
-        HAL_Delay(5);
+        HAL_Delay(10);
         ANTO_Send(ANTO_ANGLE_PID);
-        HAL_Delay(5);
+        HAL_Delay(10);
         ANTO_Send(ANTO_HEIGHT_PID);
-        HAL_Delay(5);
+        HAL_Delay(10);
         ANTO_Recived_flag.CMD2_READ_PID = 0;
         // txbuf_pos=0;
       }

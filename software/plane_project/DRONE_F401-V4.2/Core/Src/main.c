@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "all_define.h"
 #include "kalman.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -165,6 +166,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)  //NRF2401_IRQÒı½ÅÖĞ¶Ï»Øµ÷º¯Êı£¬Î
       //ÊÕµ½Ò£¿ØÆ÷·¢µÄÊı¾İ£¬½øÈë´Ëº¯Êı¡££¨Ò£¿ØÆ÷Ã¿¸ô10ms·¢ËÍÒ»´ÎÊı¾İ£©
       RC_Analy();
       NRF24L01_Write_Buf(0xa8, nrf2401_txbuf, txbuf_pos); //·ÅÈëÎŞÈË»ú×ËÌ¬½ÇµÈ×´Ì¬Êı¾İµ½·¢ËÍ»º³åÇø£¬ÎŞÈË»úÏÂ´ÎÊÕµ½Ò£¿ØÆ÷µÄÃüÁî·µ»ØÈ·ÈÏÖ¡Ê±£¬»á¸½´ø·¢ËÍnrf_txbufÊı×éÖĞ³¤¶ÈÎªtxbuf_posµÄÊı¾İ¡£
+      /*Çå¿Õ»º³åÇø*/
+      memset(nrf2401_txbuf,0x00,txbuf_pos);
+			txbuf_pos=0;
+
       // send_char_array(&huart1,nrf2401_txbuf,txbuf_pos);
     }
   }
@@ -299,7 +304,7 @@ int main(void)
       // printf("ÎÂ¶È£º%3.2f  ÆøÑ¹£º%6.2f  º£°Î£º%6d cm\r\n",temperature,presure,baro_height);
       
     }
-    printf("%f,%d\r\n",pidHeightHigh.measured,baro_height);
+    // printf("%f,%d\r\n",pidHeightHigh.measured,baro_height);
 	
     /* USER CODE END WHILE */
 
