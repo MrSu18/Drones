@@ -1,5 +1,6 @@
 #include "NRF24L01.h"
 #include "main.h"
+#include "stdio.h"
 //////////////////////////////////////////////////////////////////////////////////   
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //////////////////////////////////////////////////////////////////////////////////     
@@ -107,7 +108,7 @@ uint8_t NRF24L01_TxPacket(uint8_t *txbuf,uint8_t len)
   { 
     sta=NRF24L01_Read_Reg(STATUS);  //读取状态寄存器的值
     cnt++;
-  }    
+  }   
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+STATUS,sta); //清除TX_DS或MAX_RT中断标志
   if(sta&MAX_TX)//达到最大重发次数
   {
@@ -171,6 +172,8 @@ void RX_Mode(void)
   //STM32F401核心板接无线模块，不用加这三句就能上电即可接收。
   HAL_Delay(1);
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_RESET);
+  if(time1==0)
+    time1=micros();
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET); //CE为高,进入接收模式
 }             
 //该函数初始化NRF24L01到TX模式
@@ -202,9 +205,6 @@ void TX_Mode(void)
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET);//CE为高,10us后启动发送
   HAL_Delay(1);
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_RESET);
-
-  time1=micros();
-
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET); //CE为高,进入接收模式
 } 
 

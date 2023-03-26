@@ -48,6 +48,7 @@ uint8_t nrf2401_tx_flag=0;
 uint8_t nrf2401_txbuf[33];
 uint8_t txbuf_pos=0;
 uint32_t time=0,time1=0,time2=0;
+uint8_t time_flag=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +67,20 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)  //NRF2401_IRQ引脚中断
   uint8_t tmp_buf[35],len;
   if(GPIO_Pin==NRF24L01_IRQ_Pin)
   {
+    time2=micros();
+    if(time_flag==20)
+    {
+      time=time/20;
+      printf("time1:%d,time2:%d,time:%d\r\n",time1,time2,time);
+      time_flag=0;
+    }
+    else
+    {
+      time+=(time2-time1);
+      time_flag++;
+    }
+    
+    time1=0;
     len=NRF24L01_RxPacket(tmp_buf); //返回收到的字节数,收到的len个字节数据存在tmp_buf中
     if(len>0)//一旦接收到信息,则串口发送出去.
     { 
@@ -146,10 +161,7 @@ int main(void)
       //串口1收到的数据存在数组nrf2401_txbuf[]中，长度为txbuf_pos个字节
       TX_Mode(); //NRF24L01切换到发送模式
       if(NRF24L01_TxPacket(nrf2401_txbuf,txbuf_pos)==TX_OK)  //if NRF24L01发送成功
-      {
-        time2=micros();
-        time=time2-time1;
-        printf("time1:%d,time2:%d,time:%d\r\n",time1,time2,time);
+      {  
         HAL_GPIO_TogglePin(LED0_GPIO_Port,LED0_Pin); //切换灯的状态
         HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin); //切换灯的状态
       }
