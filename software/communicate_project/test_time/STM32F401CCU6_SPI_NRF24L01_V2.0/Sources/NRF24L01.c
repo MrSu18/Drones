@@ -159,7 +159,7 @@ void RX_Mode(void)
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_CH,NRF24L01_FREQUENCY);       //设置RF通信频率      
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RX_PW_P0,RX_PLOAD_WIDTH);//选择通道0的有效数据宽度       
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+SETUP_AW,0X03); //设置地址宽度为 5bytes
-  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_SETUP,0x0f);//设置TX发射参数,0db增益,2Mbps,低噪声增益开启   
+  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_SETUP,0x2f);//设置TX发射参数,0db增益,2Mbps,低噪声增益开启   
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+STATUS,0x70); //清除RX_DR、TX_DS、MAX_RT中断标志
 #if EN_DYNAMIC_DATA_LENGTH//if使能动态数据长度
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+FEATURE,0x04);//EN_DPL
@@ -172,8 +172,6 @@ void RX_Mode(void)
   //STM32F401核心板接无线模块，不用加这三句就能上电即可接收。
   HAL_Delay(1);
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_RESET);
-  // if(time1==0)
-  //   time1=micros();
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET); //CE为高,进入接收模式
 }             
 //该函数初始化NRF24L01到TX模式
@@ -195,7 +193,7 @@ void TX_Mode(void)
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_CH,NRF24L01_FREQUENCY);       //设置RF通道为40，范围0-125
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_SETUP,0x0f);  //设置TX发射参数,7db增益,2Mbps,低噪声增益开启   
   //status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_SETUP,0x0B);  //设置TX发射参数,0db增益,2Mbps,低噪声增益开启   
-  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+CONFIG,0x0e);    //配置基本工作模式的参数;PWR_UP,EN_CRC,16BIT_CRC,发送模式，屏蔽所有中断
+  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+CONFIG,0x4e);    //配置基本工作模式的参数;PWR_UP,EN_CRC,16BIT_CRC,发送模式，屏蔽所有中断
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+STATUS,0x70); //清除RX_DR、TX_DS、MAX_RT中断标志
 #if EN_DYNAMIC_DATA_LENGTH//if使能动态数据长度
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+DYNPD,0x01);  //DPL_P0
@@ -205,6 +203,11 @@ void TX_Mode(void)
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET);//CE为高,10us后启动发送
   HAL_Delay(1);
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_RESET);
+  if(time_flag==0)
+  {
+    time1=micros();
+    time_flag=1;
+  }
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET); //CE为高,进入接收模式
 } 
 

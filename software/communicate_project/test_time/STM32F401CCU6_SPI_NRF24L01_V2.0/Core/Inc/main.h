@@ -40,6 +40,7 @@ extern "C" {
 /* USER CODE BEGIN ET */
 uint32_t micros(void);
 extern uint32_t time,time1,time2;
+extern uint8_t time_flag;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
