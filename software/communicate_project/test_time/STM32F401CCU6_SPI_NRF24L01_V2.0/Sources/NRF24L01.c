@@ -153,7 +153,7 @@ void RX_Mode(void)
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_RESET);    
   
   status_si2401=NRF24L01_Write_Buf(NRF24L01_WRITE_REG+RX_ADDR_P0,(uint8_t*)RX_ADDRESS,RX_ADR_WIDTH);//写RX节点地址
-  //NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_AA,0x01);    //使能通道0的自动应答    
+  NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_AA,0x01);    //使能通道0的自动应答    
   //NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_AA,0x00);     //禁用通道0-5的自动应答    
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_RXADDR,0x01);//使能通道0的接收地址     
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_CH,NRF24L01_FREQUENCY);       //设置RF通信频率      
@@ -166,14 +166,14 @@ void RX_Mode(void)
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+DYNPD,0x01);  //DPL_P0
 #endif  
   //NRF24L01_Write_Reg(NRF24L01_WRITE_REG+CONFIG, 0x0f);//配置基本工作模式的参数;PWR_UP,EN_CRC,16BIT_CRC,接收模式 
-  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+CONFIG, 0x3F);//配置基本工作模式的参数;PWR_UP,EN_CRC,16BIT_CRC,接收模式,屏蔽发送中断和发送最大次数中断 
+  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+CONFIG, 0x0F);//配置基本工作模式的参数;PWR_UP,EN_CRC,16BIT_CRC,接收模式,屏蔽发送中断和发送最大次数中断 
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET); //CE为高,进入接收模式 
   //如果不加后面这三句，则飞控板要先发送成功数据才能接收，很奇怪。 加了这三句后，上电启动就能接收
   //STM32F401核心板接无线模块，不用加这三句就能上电即可接收。
   HAL_Delay(1);
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_RESET);
-  if(time1==0)
-    time1=micros();
+  // if(time1==0)
+  //   time1=micros();
   HAL_GPIO_WritePin(NRF24L01_CE_GPIO_Port, NRF24L01_CE_Pin, GPIO_PIN_SET); //CE为高,进入接收模式
 }             
 //该函数初始化NRF24L01到TX模式
@@ -188,14 +188,14 @@ void TX_Mode(void)
   status_si2401=NRF24L01_Write_Buf(NRF24L01_WRITE_REG+TX_ADDR,(uint8_t*)TX_ADDRESS,TX_ADR_WIDTH);//写TX节点地址 
   status_si2401=NRF24L01_Write_Buf(NRF24L01_WRITE_REG+RX_ADDR_P0,(uint8_t*)RX_ADDRESS,RX_ADR_WIDTH); //设置TX节点地址,主要为了使能ACK    
 
-  //NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_AA,0x01);     //使能通道0的自动应答    
+  NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_AA,0x01);     //使能通道0的自动应答    
   //NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_AA,0x00);     //禁用通道0-5的自动应答    
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+EN_RXADDR,0x01); //使能通道0的接收地址  
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+SETUP_RETR,0x1a);//设置自动重发间隔时间:500us + 86us;最大自动重发次数:10次
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_CH,NRF24L01_FREQUENCY);       //设置RF通道为40，范围0-125
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_SETUP,0x0f);  //设置TX发射参数,7db增益,2Mbps,低噪声增益开启   
   //status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+RF_SETUP,0x0B);  //设置TX发射参数,0db增益,2Mbps,低噪声增益开启   
-  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+CONFIG,0x7e);    //配置基本工作模式的参数;PWR_UP,EN_CRC,16BIT_CRC,发送模式，屏蔽所有中断
+  status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+CONFIG,0x0e);    //配置基本工作模式的参数;PWR_UP,EN_CRC,16BIT_CRC,发送模式，屏蔽所有中断
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+STATUS,0x70); //清除RX_DR、TX_DS、MAX_RT中断标志
 #if EN_DYNAMIC_DATA_LENGTH//if使能动态数据长度
   status_si2401=NRF24L01_Write_Reg(NRF24L01_WRITE_REG+DYNPD,0x01);  //DPL_P0
