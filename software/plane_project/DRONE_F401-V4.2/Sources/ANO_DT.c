@@ -175,6 +175,8 @@ send_pid:
       break;
     case ANTO_MPU_MAGIC:     //发送MPU6050和磁力计的数据
       memcpy(&Anto[2],(int8_t*)&MPU6050,sizeof(_st_Mpu));
+      AK8975.magZ=(int16_t)pidHeightHigh.measured;
+      AK8975.magY=(int16_t)baro_height;
       memcpy(&Anto[8],(int8_t*)&AK8975,sizeof(_st_Mag));
       len = 18;
       break;
@@ -206,7 +208,7 @@ send_pid:
     pt[len+4] += pt[i] + pt[i+1];
   }
   
-  // send_char_array(&huart1,(uint8_t *)pt,len+5);
+  send_char_array(&huart1,(uint8_t *)pt,len+5);
   if(FUNCTION==ANTO_STATUS)
   { 
 	  //NRF24L01_Write_Buf(0xa8, (uint8_t *)pt, len+5);
@@ -222,6 +224,13 @@ send_pid:
       nrf2401_txbuf[i]=pt[i];
     //用串口1测试数据
     // send_char_array(&huart1,(uint8_t *)pt,len+5);
+  }
+  else if(FUNCTION==ANTO_MPU_MAGIC)
+  {
+    //发到无线模块缓存区
+    txbuf_pos=len+5;
+    for(i=0;i<txbuf_pos;i++)
+      nrf2401_txbuf[i]=pt[i];
   }
 }
 /***********************************************************************
@@ -239,10 +248,10 @@ void ANTO_polling(void) //轮询扫描上位机端口
       status = 1;
       break;
     case 1:
-      //ANTO_Send(ANTO_MPU_MAGIC);
-      //HAL_Delay(1);
+      ANTO_Send(ANTO_MPU_MAGIC);
+      HAL_Delay(1);
       ANTO_Send(ANTO_STATUS);
-      //HAL_Delay(3);
+      HAL_Delay(3);
 
       if(*(uint8_t*)&ANTO_Recived_flag != 0) //一旦接收到上位机的数据，则暂停发送数据到上位机，转而去判断上位机要求飞控做什么。
       {

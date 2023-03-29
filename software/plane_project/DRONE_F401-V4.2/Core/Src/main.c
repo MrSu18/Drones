@@ -108,7 +108,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //定时器TIM1的中断回
 
     MpuGetData();  //读MPU6050原始数据
     GetAngle(&MPU6050,&Angle,0.006f); //计算姿态角
-    //OPTICAL2Read(); //读光流数据
 
     FlightPidControl(0.006f);
     MotorControl();  
@@ -137,8 +136,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //定时器TIM1的中断回
       
       //对气压计高度和加速度进行卡尔曼滤波融合
 			kalman2_state ks;
-			float x[2]={0};
-			float p[2][2]={0};
 			kalman2_init(&ks,0.06f);
 			pidHeightRate.measured+=MPU6050.accZ;//存入高度环PID的测量值
 			pidHeightHigh.measured=kalman2_filter(&ks,(float)baro_height,MPU6050.accZ,0.06f);
@@ -266,22 +263,6 @@ int main(void)
     ANTO_polling();   //匿名上位机
     PilotLED();       //LED刷新
     // printf("Remote.thr:%d,Remote.AUX6:%d,Remote.AUX5:%d \r\n",Remote.thr,Remote.AUX6,Remote.AUX5);
-    //OPTICAL2Read();
-    //=============================发送是在中断里发送的，差劲的写法==============================
-    // if(nrf2401_tx_flag>0) //串口1如果收到数据，会将nrf2401_tx_flag变量置1 ,
-    // {  //串口1收到的数据存在数组nrf2401_txbuf[]中，长度为txbuf_pos个字节
-    //   TX_Mode(); //NRF24L01切换到发送模式
-    //   if(NRF24L01_TxPacket(nrf2401_txbuf,txbuf_pos)==TX_OK)  //if NRF24L01发送成功
-    //   {
-    //     HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin); //切换灯的状态
-    //   }
-    //   // else  //发送失败
-    //     //HAL_Delay(10); //延时10ms，随后重新进入上面的if,重新发送。
-    //   txbuf_pos=0; //长度清0
-    //   nrf2401_tx_flag=0; //标志位清0
-    //   RX_Mode(); //NRF24L01切换到接收模式
-    // }
-    //=======================================================================
 
     if(uart1_flag)
     { 
