@@ -93,7 +93,6 @@ void FlightPidControl(float dt)
         //加速度环
         pidHeightAcc.measured=MPU6050.accZ;
         pidUpdate(&pidHeightAcc,dt);
-        // status = READY_12;
       }
       break;
     case EXIT_255:  //退出控制
@@ -118,7 +117,7 @@ int16_t motor[4];
 void MotorControl(void)
 {  
   volatile static uint8_t status=WAITING_1;
-  static uint8_t take_off_time=0;//飞机起飞计数器油门递增
+  static uint16_t take_off_time=0;//飞机起飞计数器油门递增
   
   if(ALL_flag.unlock == EMERGENT) //意外情况，请使用遥控紧急上锁，飞控就可以在任何情况下紧急中止飞行，锁定飞行器，退出PID控制
     status = EXIT_255;  
@@ -131,7 +130,7 @@ void MotorControl(void)
         status = WAITING_2;
       }
     case WAITING_2: //解锁完成后判断使用者是否开始拨动遥杆进行飞行控制
-      if(Remote.thr>1100)
+      if(Remote.thr>MIN_THR)
       {
         status = PROCESS_31;
       }
@@ -145,27 +144,26 @@ void MotorControl(void)
         }
         else
         {
-          if(Remote.AUX6==1 && take_off_time<140)//一键起飞判断
+          if(Remote.AUX6==1 && take_off_time<(TAKE_OFF_THR/TAKE_OFF_K))//一键起飞判断
           {
-            Remote.thr=take_off_time*10;
+            Remote.thr=take_off_time*TAKE_OFF_K;
             take_off_time++;
-            LIMIT(Remote.thr,0,1400);
+            LIMIT(Remote.thr,0,TAKE_OFF_THR);
           }
           else if(Remote.AUX6==0 && take_off_time>0)//一键降落
           {
-            Remote.thr=take_off_time*10;
+            Remote.thr=take_off_time*TAKE_OFF_K;
             take_off_time--;
-            LIMIT(Remote.thr,0,1400);
+            LIMIT(Remote.thr,0,TAKE_OFF_THR);
           }
           // printf("Remote.thr:%d,Remote.AUX6:%d,Remote.AUX5:%d \r\n",Remote.thr,Remote.AUX6,Remote.AUX5);
           temp = Remote.thr -1000 + pidHeightRate.out; //油门+定高输出值
-          if(Remote.thr<900)    //油门太低了，则限制输出  不然飞机乱转                        
+          if(Remote.thr<MIN_THR)    //油门太低了，则限制输出  不然飞机乱转                        
           {
             MOTOR1 = MOTOR2 = MOTOR3 = MOTOR4=0;
             break;
           }
         }
-
         MOTOR1 = MOTOR2 = MOTOR3 = MOTOR4 = LIMIT(temp,0,900); //留100给姿态控制
 
         MOTOR1 +=    + pidRateX.out + pidRateY.out + pidRateZ.out ;//姿态输出分配给各个电机的控制量;

@@ -117,12 +117,12 @@ void RC_Analy(void)
               Remote.AUX6 =((uint16_t)RC_rxData[22]<<8) | RC_rxData[23];  //通道8  一键起飞，一键降落
               if (last_remote.AUX6==0 && Remote.AUX6==1)//状态跳变，触发一键起飞动作
               {
-                last_remote.thr=1400;
+                last_remote.thr=TAKE_OFF_THR;
                 take_off_status=1;
               }
               else if(last_remote.AUX6==1 && Remote.AUX6==0)
               {
-                last_remote.thr=900;
+                last_remote.thr=MIN_THR;
                 take_off_status=2;
               }
               else if(take_off_status==1 && temp>last_remote.thr)
@@ -231,7 +231,7 @@ void remote_unlock(void)
   switch(status)
   {
     case WAITING_1://等待解锁
-      if(Remote.thr<900)           //解锁三步奏，油门最低->油门最高->油门最低 看到LED灯不闪了 即完成解锁
+      if(Remote.thr<MIN_THR)           //解锁三步奏，油门最低->油门最高->油门最低 看到LED灯不闪了 即完成解锁
       {       
           //if(cnt++ > 20)                                     // 油门遥杆处于最低30S自动上锁
           //{ //cnt=0;               
@@ -240,13 +240,13 @@ void remote_unlock(void)
       }    
       break;
     case WAITING_2:
-      if(Remote.thr>1800)          
+      if(Remote.thr>MAX_THR)          
       {    
         status = WAITING_3;
       }      
       break;
     case WAITING_3:
-      if(Remote.thr<900)          
+      if(Remote.thr<MIN_THR)          
       {       
         status = WAITING_4;         
       }      
@@ -257,7 +257,7 @@ void remote_unlock(void)
         LED.status = AlwaysOn;                  
         break;    
     case PROCESS_31:  //进入解锁状态
-        if(Remote.thr<900)
+        if(Remote.thr<MIN_THR)
         {
           if(cnt++ > 1500)    // 油门遥杆处于最低30S自动上锁
           { 

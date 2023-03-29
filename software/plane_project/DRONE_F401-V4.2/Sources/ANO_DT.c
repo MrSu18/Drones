@@ -208,7 +208,7 @@ send_pid:
     pt[len+4] += pt[i] + pt[i+1];
   }
   
-  send_char_array(&huart1,(uint8_t *)pt,len+5);
+  // send_char_array(&huart1,(uint8_t *)pt,len+5);
   if(FUNCTION==ANTO_STATUS)
   { 
 	  //NRF24L01_Write_Buf(0xa8, (uint8_t *)pt, len+5);
