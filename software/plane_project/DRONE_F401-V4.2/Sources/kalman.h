@@ -37,6 +37,7 @@ typedef struct{
 extern void kalman_1(struct _1_ekf_filter *ekf,float input);  //Ò»Î¬¿¨¶ûÂü
 extern void kalman2_init(kalman2_state *state,float dt);
 extern float kalman2_filter(kalman2_state *state,float z_measure,float acc_measure,float dt);
+float kalman_2_Update(float InputAngle,float InputGyro,float dt);  //¶şÎ¬¿¨¶ûÂü
 #endif
 
 

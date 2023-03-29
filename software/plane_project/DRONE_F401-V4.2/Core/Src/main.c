@@ -75,7 +75,7 @@ float temperature;
 float presure; 
 uint32_t baro_height; //海拔高度 mm 
 uint16_t voltage;    //电池电压*100后取整
-
+kalman2_state ks;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -135,11 +135,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //定时器TIM1的中断回
       baro_height = ((uint32_t)((102000.0f- presure) * 78.740f)+5)/10;  //每1mpar平均海拔高度为78.740mm   最后除以10是将mm转为cm
       
       //对气压计高度和加速度进行卡尔曼滤波融合
-			kalman2_state ks;
-			kalman2_init(&ks,0.06f);
 			pidHeightRate.measured+=MPU6050.accZ;//存入高度环PID的测量值
-			pidHeightHigh.measured=kalman2_filter(&ks,(float)baro_height,MPU6050.accZ,0.06f);
-
+			// pidHeightHigh.measured=kalman2_filter(&ks,(float)baro_height,(float)MPU6050.accZ,0.06f);
+      pidHeightHigh.measured=kalman_2_Update((float)baro_height,(float)MPU6050.accZ,0.06f);
       SPL06_flag=1;
     }
     volt_cnt++;
@@ -252,7 +250,7 @@ int main(void)
   NRF24L01_Write_Buf(0xa8, nrf2401_txbuf, 11); //发送缓冲区放入初始数据
   HAL_NVIC_EnableIRQ(NRF24L01_IRQ_EXTI_IRQn); //使能此中断本来在MX_GPIO_Init()函数的末尾，移到此等NRL24L01初始化完后再开中断
 
-
+  kalman2_init(&ks,0.06f);
   /* USER CODE END 2 */
 
   /* Infinite loop */
