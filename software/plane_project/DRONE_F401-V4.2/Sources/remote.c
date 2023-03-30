@@ -52,7 +52,7 @@ static void Check(uint8_t num)
   check_buff[0]=0xaa;
   check_buff[1]=0xaa;
   check_buff[2]=0xef;
-  check_buff[3]=0x02; //LEN
+  check_buff[3]=0x07; //LEN
   check_buff[4]=num;  //PID分组序号
   /*CHECK_SUM*/
   check_buff[5]=(uint8_t)CheckSum;
@@ -113,7 +113,7 @@ void RC_Analy(void)
               Remote.AUX3 =((uint16_t)RC_rxData[16]<<8) | RC_rxData[17];  //通道7  左下边按键都属于通道7 
               Remote.AUX4 =((uint16_t)RC_rxData[18]<<8) | RC_rxData[19];  //通道8  右下边按键都属于通道8  
               Remote.AUX5 =((uint16_t)RC_rxData[20]<<8) | RC_rxData[21];  //通道8  悬停
-              last_remote.AUX6=Remote.AUX6;
+              last_remote.AUX6=Remote.AUX6;//保留上一次的值用于状态脉冲的测量
               Remote.AUX6 =((uint16_t)RC_rxData[22]<<8) | RC_rxData[23];  //通道8  一键起飞，一键降落
               if (last_remote.AUX6==0 && Remote.AUX6==1)//状态跳变，触发一键起飞动作
               {
