@@ -52,7 +52,7 @@ static void Check(uint8_t num)
   check_buff[0]=0xaa;
   check_buff[1]=0xaa;
   check_buff[2]=0xef;
-  check_buff[3]=0x07; //LEN
+  check_buff[3]=0x02; //LEN
   check_buff[4]=num;  //PID·Ö×éÐòºÅ
   /*CHECK_SUM*/
   check_buff[5]=(uint8_t)CheckSum;
