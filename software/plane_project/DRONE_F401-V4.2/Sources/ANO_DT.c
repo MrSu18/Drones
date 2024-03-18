@@ -208,7 +208,7 @@ send_pid:
     pt[len+4] += pt[i] + pt[i+1];
   }
   
-  // send_char_array(&huart1,(uint8_t *)pt,len+5);
+  send_char_array(&huart1,(uint8_t *)pt,len+5);
   if(FUNCTION==ANTO_STATUS)
   { 
 	  //NRF24L01_Write_Buf(0xa8, (uint8_t *)pt, len+5);
@@ -252,7 +252,6 @@ void ANTO_polling(void) //轮询扫描上位机端口
       HAL_Delay(1);
       ANTO_Send(ANTO_STATUS);
       HAL_Delay(3);
-
       if(*(uint8_t*)&ANTO_Recived_flag != 0) //一旦接收到上位机的数据，则暂停发送数据到上位机，转而去判断上位机要求飞控做什么。
       {
         status = 2;

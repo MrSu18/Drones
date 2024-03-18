@@ -82,18 +82,18 @@ void FlightPidControl(float dt)
 
       CascadePID(&pidRateZ,&pidYaw,dt);  //也可以直接调用串级PID函数来处理
       //加入悬停判断
-      if (Remote.AUX5==1)
-      {
-        //高度环
-        pidUpdate(&pidHeightHigh,10*dt);    
-        pidHeightRate.desired=pidHeightHigh.out;
-        //速度环
-        pidUpdate(&pidHeightRate,10*dt);
-        pidHeightAcc.desired=pidHeightRate.out;
-        //加速度环
-        pidHeightAcc.measured=MPU6050.accZ;
-        pidUpdate(&pidHeightAcc,dt);
-      }
+      // if (Remote.AUX5==1)
+      // {
+      //   //高度环
+      //   pidUpdate(&pidHeightHigh,10*dt);    
+      //   pidHeightRate.desired=pidHeightHigh.out;
+      //   //速度环
+      //   pidUpdate(&pidHeightRate,10*dt);
+      //   pidHeightAcc.desired=pidHeightRate.out;
+      //   //加速度环
+      //   pidHeightAcc.measured=MPU6050.accZ;
+      //   pidUpdate(&pidHeightAcc,dt);
+      // }
       break;
     case EXIT_255:  //退出控制
       pidRest(pPidObject,8);
@@ -127,7 +127,7 @@ void MotorControl(void)
       MOTOR1 = MOTOR2 = MOTOR3 = MOTOR4 = 0;  //如果锁定，则电机输出都为0
       if(ALL_flag.unlock)
       {
-        status = WAITING_2;
+        status = PROCESS_31;
       }
     case WAITING_2: //解锁完成后判断使用者是否开始拨动遥杆进行飞行控制
       if(Remote.thr>MIN_THR)
@@ -140,7 +140,13 @@ void MotorControl(void)
         int16_t temp;
         if(Remote.AUX5==1)//悬停判断
         {
+          // temp = Remote.thr -1000;
           temp=pidHeightAcc.out -1000 + pidHeightRate.out;//高度环最内层的输出
+          if(Remote.thr<MIN_THR)    //油门太低了，则限制输出  不然飞机乱转                        
+          {
+            MOTOR1 = MOTOR2 = MOTOR3 = MOTOR4=0;
+            break;
+          }
         }
         else
         {
@@ -158,6 +164,7 @@ void MotorControl(void)
           }
           // printf("Remote.thr:%d,Remote.AUX6:%d,Remote.AUX5:%d \r\n",Remote.thr,Remote.AUX6,Remote.AUX5);
           temp = Remote.thr -1000 + pidHeightRate.out; //油门+定高输出值
+          // temp = Remote.thr -1000;
           if(Remote.thr<MIN_THR)    //油门太低了，则限制输出  不然飞机乱转                        
           {
             MOTOR1 = MOTOR2 = MOTOR3 = MOTOR4=0;
